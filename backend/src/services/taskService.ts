@@ -1,30 +1,31 @@
-import { Task } from '../models/Task.model';
-import { NotFoundError, BadRequestError } from '../errors';
 import path from 'path';
 import { MAX_IMAGE_SIZE, UPLOADS_DIR } from '../config';
+import { Task } from '../models';
+import { NotFoundError, BadRequestError } from '../errors';
 import { UploadedFile } from 'express-fileupload';
-import { ITaskModel } from '../types';
+import { TaskInterface } from '../types';
 
 export class TaskService {
+
+  async createTask(taskData: TaskInterface) {
+    const task = await Task.create(taskData);
+    return { task };
+  }
+
   async getAllTasks() {
     const tasks = await Task.find({});
     return { tasks, count: tasks.length };
   }
 
-  async createTask(taskData: ITaskModel) {
-    const task = await Task.create(taskData);
-    return { task };
-  }
-
   async getSingleTask(id: string) {
-    const task = await Task.findById(id);
+    const task = await Task.findById(id).populate('metaobjects');
     if (!task) {
       throw new NotFoundError({ message: 'Task not found' });
     }
     return { task };
   }
 
-  async updateTask(id: string, taskData: ITaskModel) {
+  async updateTask(id: string, taskData: TaskInterface) {
     const task = await Task.findByIdAndUpdate(id, taskData, {
       runValidators: true,
       new: true,

@@ -9,6 +9,7 @@ export const errorhandlerMiddleware: ErrorRequestHandler = (
   res: Response,
   next: NextFunction,
 ) => {
+  
   if (err instanceof CustomError) {
     const { statusCode, errors } = err;
 
@@ -21,6 +22,13 @@ export const errorhandlerMiddleware: ErrorRequestHandler = (
 
     res.status(StatusCodes.BAD_REQUEST).json({
       errors: validationErrors,
+    });
+    return;
+  }
+
+  if (err.message === 'Duplication handle') {
+    res.status(StatusCodes.BAD_REQUEST).json({
+      error: err.message,
     });
     return;
   }

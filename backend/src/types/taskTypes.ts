@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface ITaskModel extends Document {
+export interface TaskInterface extends Document {
   name: string;
   description: string;
   image: string;

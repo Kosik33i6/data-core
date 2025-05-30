@@ -1,1 +1,3 @@
-export { TaskRouter } from './task.router';
+export { TaskRouter } from './taskRouter';
+export { MetaobjectDefinitionRouter } from './metaobjectDefinitionRouter';
+export { MetaobjectRouter } from './metaobjectRouter';

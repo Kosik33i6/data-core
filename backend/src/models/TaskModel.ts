@@ -1,8 +1,8 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { isUrl } from '../utils';
-import { ITaskModel } from '../types';
+import { TaskInterface } from '../types';
 
-const TaskSchema = new Schema<ITaskModel>({
+const TaskSchema = new Schema<TaskInterface>({
   name: {
     type: String,
     trim: true,
@@ -28,6 +28,17 @@ const TaskSchema = new Schema<ITaskModel>({
       message: 'Invalid URL format',
     },
   },
+}, {
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true },
+});
+
+TaskSchema.virtual('metaobjects', {
+  ref: 'Metaobject',
+  localField: '_id',
+  foreignField: 'task',
+  justOne: false,
 });
 
 export const Task = model('Task', TaskSchema);
