@@ -7,11 +7,15 @@ import fileUpload from 'express-fileupload';
 import { connectDB } from './db/connect';
 import { errorhandlerMiddleware, notFoundMiddleware } from './middleware';
 import { TaskRouter } from './routes/';
+import { MetaobjectDefinitionRouter } from './routes';
+import { MetaobjectRouter } from './routes';
 
 config();
 
 const app = express();
 const taskRouter = new TaskRouter();
+const metaobjectDefinitionRouter = new MetaobjectDefinitionRouter();
+const metaobjectRouter = new MetaobjectRouter();
 
 app.use(morgan('tiny'));
 app.use(express.json());
@@ -26,6 +30,8 @@ app.get('/api/v1', (req, res) => {
 });
 
 app.use('/api/v1/tasks', taskRouter.getRouter());
+app.use('/api/v1/metaobject-definition', metaobjectDefinitionRouter.getRouter());
+app.use('/api/v1/metaobject', metaobjectRouter.getRouter());
 
 app.use(notFoundMiddleware);
 app.use(errorhandlerMiddleware);
