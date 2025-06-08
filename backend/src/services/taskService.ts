@@ -7,17 +7,17 @@ import { TaskInterface } from '../types';
 
 export class TaskService {
 
-  async createTask(taskData: TaskInterface) {
+  public async createTask(taskData: TaskInterface) {
     const task = await Task.create(taskData);
     return { task };
   }
 
-  async getAllTasks() {
+  public async getAllTasks() {
     const tasks = await Task.find({});
     return { tasks, count: tasks.length };
   }
 
-  async getSingleTask(id: string) {
+  public async getSingleTask(id: string) {
     const task = await Task.findById(id).populate('metaobjects');
     if (!task) {
       throw new NotFoundError({ message: 'Task not found' });
@@ -25,7 +25,7 @@ export class TaskService {
     return { task };
   }
 
-  async updateTask(id: string, taskData: TaskInterface) {
+  public async updateTask(id: string, taskData: TaskInterface) {
     const task = await Task.findByIdAndUpdate(id, taskData, {
       runValidators: true,
       new: true,
@@ -36,15 +36,15 @@ export class TaskService {
     return { task };
   }
 
-  async deleteTask(id: string) {
+  public async deleteTask(id: string) {
     const task = await Task.findByIdAndDelete(id);
     if (!task) {
       throw new NotFoundError({ message: 'Task not found' });
     }
-    return { message: 'Task was removed' };
+    return { message: 'Task was removed', task };
   }
 
-  async uploadImage(file: UploadedFile | UploadedFile[]) {
+  public async uploadImage(file: UploadedFile | UploadedFile[]) {
     if (!file) {
       throw new BadRequestError({ message: 'No files uploaded' });
     }

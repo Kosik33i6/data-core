@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import { CustomError } from '../errors';
-import mongoose from 'mongoose';
+import mongoose, { Error } from 'mongoose';
 
 export const errorhandlerMiddleware: ErrorRequestHandler = (
   err: Error | mongoose.Error.ValidationError,
@@ -9,7 +9,7 @@ export const errorhandlerMiddleware: ErrorRequestHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  
+  // console.log('err:', err.code);
   if (err instanceof CustomError) {
     const { statusCode, errors } = err;
 
@@ -18,7 +18,7 @@ export const errorhandlerMiddleware: ErrorRequestHandler = (
   }
 
   if (err instanceof mongoose.Error.ValidationError) {
-    const validationErrors = Object.values(err.errors).map((error) => error.message);
+    const validationErrors = Object.values(err.errors).map((error: Error.ValidatorError | Error.CastError) => error.message);
 
     res.status(StatusCodes.BAD_REQUEST).json({
       errors: validationErrors,
@@ -32,6 +32,8 @@ export const errorhandlerMiddleware: ErrorRequestHandler = (
     });
     return;
   }
+
+  // if (err && err.code)
 
   res
     .status(StatusCodes.INTERNAL_SERVER_ERROR)

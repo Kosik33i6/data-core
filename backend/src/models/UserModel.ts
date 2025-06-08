@@ -1,12 +1,6 @@
 import { Schema, model } from 'mongoose';
 import { isEmail } from 'validator';
-
-interface UserInterface {
-  name: string;
-  email: string;
-  password: string;
-  role: 'admin' | 'user';
-}
+import { UserInterface } from '../types';
 
 const UserSchema = new Schema<UserInterface>({
   name: {
@@ -18,7 +12,7 @@ const UserSchema = new Schema<UserInterface>({
   },
   email: {
     type: String,
-    required: [true, 'Please provide a name'],
+    required: [true, 'Please provide a email'],
     trim: true,
     unique: true,
     lowercase: true,
@@ -35,7 +29,7 @@ const UserSchema = new Schema<UserInterface>({
     type: String,
     required: [true, 'Please provide a password'],
     trim: true,
-    minLength: 3,
+    minLength: 6,
     maxLength: 50,
   },
   role: {

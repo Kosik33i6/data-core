@@ -10,8 +10,8 @@ export class MetaobjectDefinitionService {
   }
 
   public async getAllMetaobjectDefinitions() {
-    const metaobjectDefinitions = await MetaobjectDefinition.find({});
-    return { metaobjectDefinitions, count: metaobjectDefinitions.length };
+    const metaobjectsDefinition = await MetaobjectDefinition.find({});
+    return { metaobjectsDefinition, count: metaobjectsDefinition.length };
   }
 
   public async getSingleMetaobjectDefinition(id: string) {
