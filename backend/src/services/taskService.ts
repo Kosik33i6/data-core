@@ -20,7 +20,7 @@ export class TaskService {
   public async getSingleTask(id: string) {
     const task = await Task.findById(id).populate('metaobjects');
     if (!task) {
-      throw new NotFoundError({ message: 'Task not found' });
+      throw new NotFoundError('Task not found');
     }
     return { task };
   }
@@ -31,7 +31,7 @@ export class TaskService {
       new: true,
     });
     if (!task) {
-      throw new NotFoundError({ message: 'Task not found' });
+      throw new NotFoundError('Task not found');
     }
     return { task };
   }
@@ -39,18 +39,18 @@ export class TaskService {
   public async deleteTask(id: string) {
     const task = await Task.findByIdAndDelete(id);
     if (!task) {
-      throw new NotFoundError({ message: 'Task not found' });
+      throw new NotFoundError('Task not found');
     }
     return { message: 'Task was removed', task };
   }
 
   public async uploadImage(file: UploadedFile | UploadedFile[]) {
     if (!file) {
-      throw new BadRequestError({ message: 'No files uploaded' });
+      throw new BadRequestError('No files uploaded');
     }
 
     if (Array.isArray(file)) {
-      throw new BadRequestError({ message: 'Multiple files uploaded. Expected only one image.' });
+      throw new BadRequestError('Multiple files uploaded. Expected only one image.');
     }
 
     await this.validateImage(file);
@@ -61,11 +61,11 @@ export class TaskService {
 
   private async validateImage(image: UploadedFile) {
     if (!image.mimetype.startsWith('image')) {
-      throw new BadRequestError({ message: 'Invalid file format for image' });
+      throw new BadRequestError('Invalid file format for image');
     }
 
     if (image.size > MAX_IMAGE_SIZE) {
-      throw new BadRequestError({ message: 'Image is too big' });
+      throw new BadRequestError('Image is too big');
     }
   }
 

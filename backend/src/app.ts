@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import fileUpload from 'express-fileupload';
 
 import { connectDB } from './db/connect';
-import { errorhandlerMiddleware, notFoundMiddleware } from './middleware';
+import { ErrorHandlerMiddleware, notFoundMiddleware } from './middleware';
 import { TaskRouter } from './routes/';
 import { MetaobjectDefinitionRouter } from './routes';
 import { MetaobjectRouter } from './routes';
@@ -37,7 +37,7 @@ app.use('/api/v1/metaobjects', metaobjectRouter.getRouter());
 app.use('/api/v1/users', userRouter.getRouter());
 
 app.use(notFoundMiddleware);
-app.use(errorhandlerMiddleware);
+app.use(ErrorHandlerMiddleware.handle);
 
 const port = process.env.PORT || 5000;
 const mongoUri = process.env.MONGO_URI;

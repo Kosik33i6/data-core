@@ -40,9 +40,7 @@ export class TaskController {
 
   public uploadImage = async (req: Request, res: Response): Promise<void> => {
     if (!req.files) {
-      throw new BadRequestError({
-        message: 'No files uploaded',
-      });
+      throw new BadRequestError('No files uploaded');
     }
     const image = await this.taskService.uploadImage(req.files.image);
     res.status(StatusCodes.CREATED).json(image);

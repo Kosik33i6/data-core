@@ -20,9 +20,9 @@ export class MetaobjectService {
   public async getSingleMetaobject(id: string) {
     const metaobject = await Metaobject.findById(id);
     if (!metaobject) {
-      throw new NotFoundError({
-        message: 'Metaobject not found',
-      });
+      throw new NotFoundError(
+        'Metaobject not found',
+      );
     }
 
     return { metaobject };
@@ -37,7 +37,7 @@ export class MetaobjectService {
       new: true,
     });
     if (!metaobject) {
-      throw new NotFoundError({ message: 'Metaobject not found' });
+      throw new NotFoundError('Metaobject not found');
     }
     return { metaobject };
   }
@@ -45,7 +45,7 @@ export class MetaobjectService {
   public async deleteMetaobject(id: string) {
     const metaobject = await Metaobject.findByIdAndDelete(id);
     if (!metaobject) {
-      throw new NotFoundError({ message: 'Metaobject not found' });
+      throw new NotFoundError('Metaobject not found');
     }
     return { message: 'Metaobject was removed' };
   }
