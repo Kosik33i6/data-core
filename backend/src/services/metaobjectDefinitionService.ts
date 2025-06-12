@@ -17,9 +17,9 @@ export class MetaobjectDefinitionService {
   public async getSingleMetaobjectDefinition(id: string) {
     const metaobjectDefinition = await MetaobjectDefinition.findById(id).populate('metaobjects');
     if (!metaobjectDefinition) {
-      throw new NotFoundError({
-        message: 'Metaobject definition not found',
-      });
+      throw new NotFoundError(
+        'Metaobject definition not found',
+      );
     }
 
     return { metaobjectDefinition };
@@ -34,7 +34,7 @@ export class MetaobjectDefinitionService {
       new: true,
     });
     if (!metaobjectDefinition) {
-      throw new NotFoundError({ message: 'Metaobject Definition not found' });
+      throw new NotFoundError('Metaobject Definition not found');
     }
     return { metaobjectDefinition };
   }
@@ -42,7 +42,7 @@ export class MetaobjectDefinitionService {
   public async deleteMetaobjectDefinition(id: string) {
     const metaobjectDefinition = await MetaobjectDefinition.findByIdAndDelete(id);
     if (!metaobjectDefinition) {
-      throw new NotFoundError({ message: 'Metaobject Definition not found' });
+      throw new NotFoundError('Metaobject Definition not found');
     }
     return { message: 'Metaobject Definition was removed' };
   }

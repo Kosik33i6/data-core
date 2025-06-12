@@ -1,42 +1,96 @@
 import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
-import { CustomError } from '../errors';
-import mongoose, { Error } from 'mongoose';
+import { Error } from 'mongoose';
+import { MongoServerError } from 'mongodb';
+import { NotFoundError } from '../errors';
+import { ErrorResponse } from '../types';
 
-export const errorhandlerMiddleware: ErrorRequestHandler = (
-  err: Error | mongoose.Error.ValidationError,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  // console.log('err:', err.code);
-  if (err instanceof CustomError) {
-    const { statusCode, errors } = err;
+export class ErrorHandlerMiddleware {
+  public static handle(err: unknown, req: Request, res: Response, next: NextFunction): void {
 
-    res.status(statusCode).json({ errors });
-    return;
+    const errorResponse = ErrorHandlerMiddleware.processError(err);
+    res.status(errorResponse.statusCode).json(errorResponse.body);
   }
 
-  if (err instanceof mongoose.Error.ValidationError) {
-    const validationErrors = Object.values(err.errors).map((error: Error.ValidatorError | Error.CastError) => error.message);
+  private static processError(err: unknown): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
 
-    res.status(StatusCodes.BAD_REQUEST).json({
-      errors: validationErrors,
-    });
-    return;
+    if (err instanceof Error.ValidationError) {
+      return ErrorHandlerMiddleware.handleValidationError(err);
+    }
+
+    if (err instanceof NotFoundError) {
+      return ErrorHandlerMiddleware.handleNotFoundError(err);
+    }
+
+    if (err instanceof MongoServerError && err.code === 11000) {
+      return ErrorHandlerMiddleware.handleDuplicateKeyError(err);
+    }
+
+    if (err instanceof Error.CastError) {
+      return ErrorHandlerMiddleware.handleCastError(err);
+    }
+    
+    return ErrorHandlerMiddleware.handleServerError();
   }
 
-  if (err.message === 'Duplication handle') {
-    res.status(StatusCodes.BAD_REQUEST).json({
-      error: err.message,
-    });
-    return;
+  private static handleValidationError(err: Error.ValidationError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    const validationErrors = Object.values(err.errors).map(
+      (error: Error.ValidatorError | Error.CastError) => error.message,
+    );
+
+    return {
+      statusCode: StatusCodes.BAD_REQUEST,
+      body: { errors: validationErrors },
+    };
   }
 
-  // if (err && err.code)
+  private static handleNotFoundError(err: NotFoundError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    return {
+      statusCode: StatusCodes.NOT_FOUND,
+      body: { message: err.message },
+    };
+  }
 
-  res
-    .status(StatusCodes.INTERNAL_SERVER_ERROR)
-    .json({ message: 'Internal Server Error' });
-  return;
-};
+  private static handleDuplicateKeyError(err: MongoServerError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    const duplicateField = Object.keys(err.errorResponse?.keyValue || {})[0] || 'field';
+
+    return {
+      statusCode: StatusCodes.BAD_REQUEST,
+      body: {
+        message: `Duplicate value entered for ${ duplicateField } field, please choose another value`,
+      },
+    };
+  }
+
+  private static handleCastError(err: Error.CastError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    return {
+      statusCode: StatusCodes.NOT_FOUND,
+      body: { message: `No item found with id: ${ err.value }` },
+    };
+  }
+
+  private static handleServerError(): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    return {
+      statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+      body: { message: 'Something went wrong, please try again later' },
+    };
+  }
+}

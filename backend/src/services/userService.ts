@@ -16,7 +16,7 @@ export class UserService {
   public async getSingleUser(id: string) {
     const user = await User.findById(id);
     if (!user) {
-      throw new NotFoundError({ message: 'User not found' });
+      throw new NotFoundError('User not found');
     }
     return { user };
   }
@@ -27,7 +27,7 @@ export class UserService {
       new: true,
     });
     if (!user) {
-      throw new NotFoundError({ message: 'User not found' });
+      throw new NotFoundError('User not found');
     }
     return { user };
   }
@@ -35,7 +35,7 @@ export class UserService {
   public async deleteUser(id: string) {
     const user = await User.findByIdAndDelete(id);
     if (!user) {
-      throw new NotFoundError({ message: 'User not found' });
+      throw new NotFoundError('User not found');
     }
     return { message: 'User was removed', user };
   }

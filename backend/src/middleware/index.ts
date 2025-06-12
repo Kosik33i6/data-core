@@ -1,2 +1,2 @@
 export { notFoundMiddleware } from './notFoundMiddleware';
-export { errorhandlerMiddleware } from './errorHandlerMiddleware';
+export { ErrorHandlerMiddleware } from './errorHandlerMiddleware';
