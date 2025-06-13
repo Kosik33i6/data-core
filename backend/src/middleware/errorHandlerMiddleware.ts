@@ -6,11 +6,11 @@ import { NotFoundError } from '../errors';
 import { ErrorResponse } from '../types';
 
 export class ErrorHandlerMiddleware {
-  public static handle(err: unknown, req: Request, res: Response, next: NextFunction): void {
+  public static handle = (err: unknown, req: Request, res: Response, next: NextFunction): void => {
 
-    const errorResponse = ErrorHandlerMiddleware.processError(err);
+    const errorResponse = this.processError(err);
     res.status(errorResponse.statusCode).json(errorResponse.body);
-  }
+  };
 
   private static processError(err: unknown): {
     statusCode: number;
@@ -18,22 +18,22 @@ export class ErrorHandlerMiddleware {
   } {
 
     if (err instanceof Error.ValidationError) {
-      return ErrorHandlerMiddleware.handleValidationError(err);
+      return this.handleValidationError(err);
     }
 
     if (err instanceof NotFoundError) {
-      return ErrorHandlerMiddleware.handleNotFoundError(err);
+      return this.handleNotFoundError(err);
     }
 
     if (err instanceof MongoServerError && err.code === 11000) {
-      return ErrorHandlerMiddleware.handleDuplicateKeyError(err);
+      return this.handleDuplicateKeyError(err);
     }
 
     if (err instanceof Error.CastError) {
-      return ErrorHandlerMiddleware.handleCastError(err);
+      return this.handleCastError(err);
     }
-    
-    return ErrorHandlerMiddleware.handleServerError();
+
+    return this.handleServerError();
   }
 
   private static handleValidationError(err: Error.ValidationError): {
