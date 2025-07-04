@@ -16,7 +16,8 @@ export class UserRouter {
     this.router
       .route('/')
       .get(this.userController.getAllUsers)
-      .post(this.userController.createUser);
+      .post(this.userController.createUser)
+      .delete(this.userController.deleteAllUsers);
 
     this.router
       .route('/:id')
