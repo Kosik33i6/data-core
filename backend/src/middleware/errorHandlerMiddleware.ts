@@ -2,12 +2,11 @@ import { StatusCodes } from 'http-status-codes';
 import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
 import { Error } from 'mongoose';
 import { MongoServerError } from 'mongodb';
-import { NotFoundError } from '../errors';
+import { NotFoundError, UnauthorizedError } from '../errors';
 import { ErrorResponse } from '../types';
 
 export class ErrorHandlerMiddleware {
   public static handle = (err: unknown, req: Request, res: Response, next: NextFunction): void => {
-
     const errorResponse = this.processError(err);
     res.status(errorResponse.statusCode).json(errorResponse.body);
   };
@@ -31,6 +30,10 @@ export class ErrorHandlerMiddleware {
 
     if (err instanceof Error.CastError) {
       return this.handleCastError(err);
+    }
+
+    if (err instanceof UnauthorizedError) {
+      return this.handleUnauthorizedError(err);
     }
 
     return this.handleServerError();
@@ -65,7 +68,6 @@ export class ErrorHandlerMiddleware {
     body: ErrorResponse
   } {
     const duplicateField = Object.keys(err.errorResponse?.keyValue || {})[0] || 'field';
-
     return {
       statusCode: StatusCodes.BAD_REQUEST,
       body: {
@@ -81,6 +83,16 @@ export class ErrorHandlerMiddleware {
     return {
       statusCode: StatusCodes.NOT_FOUND,
       body: { message: `No item found with id: ${ err.value }` },
+    };
+  }
+
+  private static handleUnauthorizedError(err: UnauthorizedError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    return {
+      statusCode: StatusCodes.FORBIDDEN,
+      body: { message: err.message },
     };
   }
 

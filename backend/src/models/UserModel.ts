@@ -1,8 +1,9 @@
 import { Schema, model } from 'mongoose';
 import { isEmail } from 'validator';
-import { UserInterface } from '../types';
+import { UserDocument } from '../types';
+import { genSalt, hash, compare } from 'bcrypt-ts';
 
-const UserSchema = new Schema<UserInterface>({
+const UserSchema = new Schema<UserDocument>({
   name: {
     type: String,
     required: [true, 'Please provide a name'],
@@ -37,6 +38,15 @@ const UserSchema = new Schema<UserInterface>({
     enum: ['admin', 'user'],
     default: 'user',
   },
+}, { timestamps: true });
+
+UserSchema.pre('save', async function (next) {
+  const salt = await genSalt(12);
+  this.password = await hash(this.password, salt);
 });
 
-export const User = model<UserInterface>('User', UserSchema);
+UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
+  return await compare(candidatePassword, this.password);
+};
+
+export const User = model<UserDocument>('User', UserSchema);

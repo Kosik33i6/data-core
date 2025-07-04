@@ -1,6 +1,6 @@
 import { UserInterface } from '../types';
 import { User } from '../models';
-import { NotFoundError, BadRequestError } from '../errors';
+import { NotFoundError, BadRequestError, UnauthorizedError } from '../errors';
 
 export class UserService {
   public async createUser(userData: UserInterface) {
@@ -33,10 +33,19 @@ export class UserService {
   }
 
   public async deleteUser(id: string) {
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findById(id);
     if (!user) {
       throw new NotFoundError('User not found');
     }
+    if (user.role === 'admin') {
+      throw new UnauthorizedError('Admin user cannot be deleted');
+    }
+    await user.deleteOne();
     return { message: 'User was removed', user };
+  }
+
+  public async deleteAllUsers() {
+    const users = await User.deleteMany({});
+    return { message: 'Users were removed', users };
   }
 }
