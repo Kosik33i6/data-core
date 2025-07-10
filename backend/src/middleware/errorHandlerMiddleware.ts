@@ -1,12 +1,16 @@
 import { StatusCodes } from 'http-status-codes';
-import { Request, Response, NextFunction, ErrorRequestHandler } from 'express';
+import { Request, Response } from 'express';
 import { Error } from 'mongoose';
 import { MongoServerError } from 'mongodb';
-import { NotFoundError, UnauthorizedError } from '../errors';
+import {
+  NotFoundError,
+  UnauthorizedError,
+  UnauthenticatedError,
+} from '../errors';
 import { ErrorResponse } from '../types';
 
 export class ErrorHandlerMiddleware {
-  public static handle = (err: unknown, req: Request, res: Response, next: NextFunction): void => {
+  public static handle = (err: unknown, req: Request, res: Response): void => {
     const errorResponse = this.processError(err);
     res.status(errorResponse.statusCode).json(errorResponse.body);
   };
@@ -34,6 +38,10 @@ export class ErrorHandlerMiddleware {
 
     if (err instanceof UnauthorizedError) {
       return this.handleUnauthorizedError(err);
+    }
+
+    if (err instanceof UnauthenticatedError) {
+      return this.handleUnauthenticatedError(err);
     }
 
     return this.handleServerError();
@@ -92,6 +100,16 @@ export class ErrorHandlerMiddleware {
   } {
     return {
       statusCode: StatusCodes.FORBIDDEN,
+      body: { message: err.message },
+    };
+  }
+
+  private static handleUnauthenticatedError(err: UnauthenticatedError): {
+    statusCode: number;
+    body: ErrorResponse
+  } {
+    return {
+      statusCode: StatusCodes.UNAUTHORIZED,
       body: { message: err.message },
     };
   }

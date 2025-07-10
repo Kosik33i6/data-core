@@ -31,6 +31,7 @@ app.use(fileUpload({
 }));
 app.use(cookieParser(process.env.JWT_SECRET));
 app.get('/api/v1', (req, res) => {
+  console.log(req.signedCookies);
   res.send('API is running');
 });
 

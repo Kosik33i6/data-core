@@ -10,3 +10,4 @@ export {
   UserDocument,
 } from './userTypes';
 export { ErrorResponse } from './errorTypes';
+export { AuthenticatedRequest } from './utlis';
