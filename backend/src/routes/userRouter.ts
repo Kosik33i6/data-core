@@ -1,6 +1,7 @@
 import express from 'express';
 import { UserService } from '../services';
 import { UserController } from '../controllers';
+import { authenticateUser } from '../middleware';
 
 export class UserRouter {
   private readonly router: express.Router;
@@ -15,15 +16,15 @@ export class UserRouter {
   private initializeRoutes(): void {
     this.router
       .route('/')
-      .get(this.userController.getAllUsers)
-      .post(this.userController.createUser)
-      .delete(this.userController.deleteAllUsers);
+      .get(authenticateUser, this.userController.getAllUsers)
+      .post(authenticateUser, this.userController.createUser)
+      .delete(authenticateUser, this.userController.deleteAllUsers);
 
     this.router
       .route('/:id')
-      .get(this.userController.getSingleUser)
-      .patch(this.userController.updateUser)
-      .delete(this.userController.deleteUser);
+      .get(authenticateUser, this.userController.getSingleUser)
+      .patch(authenticateUser, this.userController.updateUser)
+      .delete(authenticateUser, this.userController.deleteUser);
   }
 
   public getRouter(): express.Router {

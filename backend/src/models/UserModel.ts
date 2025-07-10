@@ -3,6 +3,9 @@ import { isEmail } from 'validator';
 import { UserDocument } from '../types';
 import { genSalt, hash, compare } from 'bcrypt-ts';
 
+// ? Update roles
+// * const ROLES = ['owner', 'superAdmin', 'admin', 'editor', 'viewer', 'guest'] as const;
+
 const UserSchema = new Schema<UserDocument>({
   name: {
     type: String,
@@ -40,7 +43,7 @@ const UserSchema = new Schema<UserDocument>({
   },
 }, { timestamps: true });
 
-UserSchema.pre('save', async function (next) {
+UserSchema.pre('save', async function () {
   const salt = await genSalt(12);
   this.password = await hash(this.password, salt);
 });
