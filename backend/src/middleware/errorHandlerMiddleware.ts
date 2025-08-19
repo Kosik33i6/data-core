@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { Error } from 'mongoose';
 import { MongoServerError } from 'mongodb';
 import {
@@ -10,7 +10,7 @@ import {
 import { ErrorResponse } from '../types';
 
 export class ErrorHandlerMiddleware {
-  public static handle = (err: unknown, req: Request, res: Response): void => {
+  public static handle = (err: unknown, req: Request, res: Response, next: NextFunction): void => {
     const errorResponse = this.processError(err);
     res.status(errorResponse.statusCode).json(errorResponse.body);
   };
@@ -19,7 +19,6 @@ export class ErrorHandlerMiddleware {
     statusCode: number;
     body: ErrorResponse
   } {
-
     if (err instanceof Error.ValidationError) {
       return this.handleValidationError(err);
     }

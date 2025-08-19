@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes';
 
 export abstract class CustomError extends Error {
-  protected statusCode: number;
+  public statusCode: number;
 
   protected constructor(message: string, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
     super(message);

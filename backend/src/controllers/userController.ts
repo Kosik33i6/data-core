@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { BadRequestError } from '../errors';
 import { UserService } from '../services';
+import { AuthenticatedRequest } from '../types';
 
 export class UserController {
   private userService: UserService;
@@ -26,9 +26,18 @@ export class UserController {
     res.status(StatusCodes.OK).json(user);
   };
 
-  public updateUser = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const updatedUser = await this.userService.updateUser(id, req.body);
+  public showCurrentUser = async (
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> => {
+    const currentUser = await this.userService.showCurrentUser(req);
+    res.status(StatusCodes.OK).json(currentUser);
+  };
+  public updateUser = async (
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> => {
+    const updatedUser = await this.userService.updateUser(req, res);
     res.status(StatusCodes.OK).json(updatedUser);
   };
 
@@ -38,8 +47,31 @@ export class UserController {
     res.status(StatusCodes.OK).json(deletedUser);
   };
 
-  public deleteAllUsers = async (req: Request, res: Response): Promise<void> => {
+  public deleteCurrentUser = async (
+    req: AuthenticatedRequest,
+    res: Response,
+  ): Promise<void> => {
+    await this.userService.deleteCurrentUser(req, res);
+    res
+      .status(StatusCodes.OK)
+      .json({ message: 'You have been deleted successfully!' });
+  };
+
+  public deleteAllUsers = async (
+    req: Request,
+    res: Response,
+  ): Promise<void> => {
     const deletedUsers = await this.userService.deleteAllUsers();
     res.status(StatusCodes.OK).json(deletedUsers);
+  };
+
+  public updateUserPassword = async (
+    req: Request,
+    res: Response,
+  ): Promise<void> => {
+    await this.userService.updateUserPassword(req);
+    res
+      .status(StatusCodes.OK)
+      .json({ message: 'User password was updated successfully.' });
   };
 }
