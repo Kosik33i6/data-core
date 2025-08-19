@@ -21,9 +21,18 @@ export class UserRouter {
       .delete(authenticateUser, this.userController.deleteAllUsers);
 
     this.router
+      .route('/me')
+      .get(authenticateUser, this.userController.showCurrentUser)
+      .patch(authenticateUser, this.userController.updateUser)
+      .delete(authenticateUser, this.userController.deleteCurrentUser);
+
+    this.router
+      .route('/me/password')
+      .patch(authenticateUser, this.userController.updateUserPassword);
+
+    this.router
       .route('/:id')
       .get(authenticateUser, this.userController.getSingleUser)
-      .patch(authenticateUser, this.userController.updateUser)
       .delete(authenticateUser, this.userController.deleteUser);
   }
 
