@@ -24,9 +24,7 @@ export class TaskRouter {
       .patch(this.taskController.updateTask)
       .delete(this.taskController.deleteTask);
 
-    this.router
-      .route('/uploadImage')
-      .post(this.taskController.uploadImage);
+    this.router.route('/uploadImage').post(this.taskController.uploadImage);
   }
 
   public getRouter(): express.Router {
