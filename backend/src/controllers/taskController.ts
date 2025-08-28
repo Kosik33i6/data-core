@@ -11,30 +11,27 @@ export class TaskController {
   }
 
   public createTask = async (req: Request, res: Response): Promise<void> => {
-    const task = await this.taskService.createTask(req.body);
+    const task = await this.taskService.createTask(req);
     res.status(StatusCodes.CREATED).json(task);
   };
 
   public getAllTasks = async (req: Request, res: Response): Promise<void> => {
-    const tasks = await this.taskService.getAllTasks();
+    const tasks = await this.taskService.getAllTasks(req);
     res.status(StatusCodes.OK).json(tasks);
   };
 
   public getSingleTask = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const task = await this.taskService.getSingleTask(id);
+    const task = await this.taskService.getSingleTask(req);
     res.status(StatusCodes.OK).json(task);
   };
 
   public updateTask = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const updatedTask = await this.taskService.updateTask(id, req.body);
+    const updatedTask = await this.taskService.updateTask(req);
     res.status(StatusCodes.OK).json(updatedTask);
   };
 
   public deleteTask = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const deletedTask = await this.taskService.deleteTask(id);
+    const deletedTask = await this.taskService.deleteTask(req);
     res.status(StatusCodes.OK).json(deletedTask);
   };
 

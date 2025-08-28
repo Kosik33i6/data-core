@@ -10,14 +10,20 @@ import {
 import { ErrorResponse } from '../types';
 
 export class ErrorHandlerMiddleware {
-  public static handle = (err: unknown, req: Request, res: Response, next: NextFunction): void => {
+  public static handle = (
+    err: unknown,
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void => {
+    console.log(err);
     const errorResponse = this.processError(err);
     res.status(errorResponse.statusCode).json(errorResponse.body);
   };
 
   private static processError(err: unknown): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     if (err instanceof Error.ValidationError) {
       return this.handleValidationError(err);
@@ -48,7 +54,7 @@ export class ErrorHandlerMiddleware {
 
   private static handleValidationError(err: Error.ValidationError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     const validationErrors = Object.values(err.errors).map(
       (error: Error.ValidatorError | Error.CastError) => error.message,
@@ -62,7 +68,7 @@ export class ErrorHandlerMiddleware {
 
   private static handleNotFoundError(err: NotFoundError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     return {
       statusCode: StatusCodes.NOT_FOUND,
@@ -72,30 +78,31 @@ export class ErrorHandlerMiddleware {
 
   private static handleDuplicateKeyError(err: MongoServerError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
-    const duplicateField = Object.keys(err.errorResponse?.keyValue || {})[0] || 'field';
+    const duplicateField =
+      Object.keys(err.errorResponse?.keyValue || {})[0] || 'field';
     return {
       statusCode: StatusCodes.BAD_REQUEST,
       body: {
-        message: `Duplicate value entered for ${ duplicateField } field, please choose another value`,
+        message: `Duplicate value entered for ${duplicateField} field, please choose another value`,
       },
     };
   }
 
   private static handleCastError(err: Error.CastError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     return {
       statusCode: StatusCodes.NOT_FOUND,
-      body: { message: `No item found with id: ${ err.value }` },
+      body: { message: `No item found with id: ${err.value}` },
     };
   }
 
   private static handleUnauthorizedError(err: UnauthorizedError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     return {
       statusCode: StatusCodes.FORBIDDEN,
@@ -105,7 +112,7 @@ export class ErrorHandlerMiddleware {
 
   private static handleUnauthenticatedError(err: UnauthenticatedError): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     return {
       statusCode: StatusCodes.UNAUTHORIZED,
@@ -115,7 +122,7 @@ export class ErrorHandlerMiddleware {
 
   private static handleServerError(): {
     statusCode: number;
-    body: ErrorResponse
+    body: ErrorResponse;
   } {
     return {
       statusCode: StatusCodes.INTERNAL_SERVER_ERROR,

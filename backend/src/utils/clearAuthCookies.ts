@@ -6,5 +6,6 @@ export const clearAuthCookies = (res: Response) => {
     expires: new Date(Date.now() + 1000),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
+    sameSite: 'none',
   });
 };

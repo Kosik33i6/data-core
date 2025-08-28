@@ -1,6 +1,7 @@
 import express from 'express';
 import { TaskController } from '../controllers';
 import { TaskService } from '../services';
+import { authenticateUser } from '../middleware';
 
 export class TaskRouter {
   private readonly router: express.Router;
@@ -15,16 +16,18 @@ export class TaskRouter {
   private initializeRoutes(): void {
     this.router
       .route('/')
-      .get(this.taskController.getAllTasks)
-      .post(this.taskController.createTask);
+      .get(authenticateUser, this.taskController.getAllTasks)
+      .post(authenticateUser, this.taskController.createTask);
 
     this.router
       .route('/:id')
-      .get(this.taskController.getSingleTask)
-      .patch(this.taskController.updateTask)
-      .delete(this.taskController.deleteTask);
+      .get(authenticateUser, this.taskController.getSingleTask)
+      .patch(authenticateUser, this.taskController.updateTask)
+      .delete(authenticateUser, this.taskController.deleteTask);
 
-    this.router.route('/uploadImage').post(this.taskController.uploadImage);
+    this.router
+      .route('/uploadImage')
+      .post(authenticateUser, this.taskController.uploadImage);
   }
 
   public getRouter(): express.Router {

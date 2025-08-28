@@ -10,5 +10,6 @@ export const attachCookiesToResponse = (res: Response, user: TokenUser) => {
     expires: new Date(Date.now() + oneWeek),
     secure: process.env.NODE_ENV === 'production',
     signed: true,
+    sameSite: 'none',
   });
 };
