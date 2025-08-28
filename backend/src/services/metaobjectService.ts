@@ -1,52 +1,54 @@
+import { Request } from 'express';
 import { NotFoundError } from '../errors';
 import { Metaobject } from '../models';
-import { MetaobjectInterface } from '../types';
+import { checkPermissions } from '../utils';
+import { MetaobjectInterface, MetaobjectsResult, DeleteMetaobjectsResult } from '../types';
 
 export class MetaobjectService {
+  public createMetaobject = async (req: Request): Promise<MetaobjectInterface> => {
+    const metaobject: MetaobjectInterface = await Metaobject.create({
+      ...req.body,
+      user: req.user.id,
+    });
+    return metaobject;
+  };
 
-  public async createMetaobject(metaobjectDefinitionData: MetaobjectInterface) {
-    const metaobject = await Metaobject.create(metaobjectDefinitionData);
-    return { metaobject };
-  }
-
-  public async getAllMetaobject() {
-    const metaobjects = await Metaobject.find({}).populate({
+  public async getAllMetaobject(req: Request): Promise<MetaobjectsResult> {
+    const metaobjects: MetaobjectInterface[] = await Metaobject.find({ user: req.user.id }).populate({
       path: 'metaobjectDefinition',
       select: 'name handle',
     });
     return { metaobjects, count: metaobjects.length };
   }
 
-  public async getSingleMetaobject(id: string) {
+  public getSingleMetaobject = async (req: Request): Promise<MetaobjectInterface> => {
+    const { id } = req.params;
     const metaobject = await Metaobject.findById(id);
     if (!metaobject) {
-      throw new NotFoundError(
-        'Metaobject not found',
-      );
+      throw new NotFoundError('Metaobject not found');
     }
+    checkPermissions(req.user.id, metaobject.user);
+    return metaobject;
+  };
 
-    return { metaobject };
-  }
-
-  public async updateMetaobject(
-    id: string,
-    metaobjectDefinitionData: MetaobjectInterface,
-  ) {
-    const metaobject = await Metaobject.findByIdAndUpdate(id, metaobjectDefinitionData, {
-      runValidators: true,
-      new: true,
-    });
+  public updateMetaobject = async (req: Request): Promise<MetaobjectInterface> => {
+    const { id } = req.params;
+    const metaobject = await Metaobject.findById(id);
     if (!metaobject) {
       throw new NotFoundError('Metaobject not found');
     }
-    return { metaobject };
-  }
+    checkPermissions(req.user.id, metaobject.user);
+    Object.assign(metaobject, req.body);
+    return metaobject;
+  };
 
-  public async deleteMetaobject(id: string) {
-    const metaobject = await Metaobject.findByIdAndDelete(id);
+  public deleteMetaobject = async (req: Request): Promise<DeleteMetaobjectsResult> => {
+    const { id } = req.params;
+    const metaobject = await Metaobject.findById(id);
     if (!metaobject) {
       throw new NotFoundError('Metaobject not found');
     }
-    return { message: 'Metaobject was removed' };
-  }
+    checkPermissions(req.user.id, metaobject.user);
+    return { message: 'Metaobject was removed', metaobject };
+  };
 }

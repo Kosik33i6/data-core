@@ -1,10 +1,10 @@
-import { Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { UnauthenticatedError, UnauthorizedError } from '../errors';
 import { isTokenValid } from '../utils';
-import { AuthenticatedRequest, UserRole } from '../types';
+import { UserRole } from '../types';
 
 export const authenticateUser = async (
-  req: AuthenticatedRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => {
@@ -26,11 +26,7 @@ export const authenticateUser = async (
 };
 
 export const authorizePermissions = (...roles: UserRole[]) => {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-    if (!req.user) {
-      throw new UnauthenticatedError('User not authenticated');
-    }
-
+  return (req: Request, res: Response, next: NextFunction) => {
     if (!roles.includes(req.user.role)) {
       throw new UnauthorizedError(
         `Unauthorized access. Required role: ${roles.join(' or ')}.`,

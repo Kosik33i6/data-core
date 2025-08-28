@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { UserService } from '../services';
-import { AuthenticatedRequest } from '../types';
 
 export class UserController {
   private userService: UserService;
@@ -27,16 +26,13 @@ export class UserController {
   };
 
   public showCurrentUser = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
   ): Promise<void> => {
     const currentUser = await this.userService.showCurrentUser(req);
     res.status(StatusCodes.OK).json(currentUser);
   };
-  public updateUser = async (
-    req: AuthenticatedRequest,
-    res: Response,
-  ): Promise<void> => {
+  public updateUser = async (req: Request, res: Response): Promise<void> => {
     const updatedUser = await this.userService.updateUser(req, res);
     res.status(StatusCodes.OK).json(updatedUser);
   };
@@ -48,7 +44,7 @@ export class UserController {
   };
 
   public deleteCurrentUser = async (
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
   ): Promise<void> => {
     await this.userService.deleteCurrentUser(req, res);

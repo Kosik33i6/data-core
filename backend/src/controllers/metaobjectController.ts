@@ -10,30 +10,28 @@ export class MetaobjectController {
   }
 
   public createMetaobject = async (req: Request, res: Response): Promise<void> => {
-    const metaobject = await this.metaobjectService.createMetaobject(req.body);
-    res.status(StatusCodes.CREATED).json(metaobject);
+    const metaobject = await this.metaobjectService.createMetaobject(req);
+    res.status(StatusCodes.CREATED).json({ metaobject });
   };
 
   public getAllMetaobject = async (req: Request, res: Response): Promise<void> => {
-    const metaobject = await this.metaobjectService.getAllMetaobject();
+    const metaobject = await this.metaobjectService.getAllMetaobject(req);
     res.status(StatusCodes.OK).json(metaobject);
   };
 
   public getSingleMetaobject = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const metaobject = await this.metaobjectService.getSingleMetaobject(id);
+    const metaobject = await this.metaobjectService.getSingleMetaobject(req);
     res.status(StatusCodes.OK).json(metaobject);
   };
 
   public updateMetaobject = async (req: Request, res: Response): Promise<void> => {
-    const { id } = req.params;
-    const updatedMetaobject = await this.metaobjectService.updateMetaobject(id, req.body);
+    const updatedMetaobject = await this.metaobjectService.updateMetaobject(req);
     res.status(StatusCodes.OK).json(updatedMetaobject);
   };
 
   public deleteMetaobject = async (req: Request, res: Response): Promise<void> => {
     const { id } = req.params;
-    const deletedMetaobject = await this.metaobjectService.deleteMetaobject(id);
+    const deletedMetaobject = await this.metaobjectService.deleteMetaobject(req);
     res.status(StatusCodes.OK).json(deletedMetaobject);
   };
 }

@@ -1,6 +1,7 @@
 import express from 'express';
 import { MetaobjectDefinitionController } from '../controllers';
 import { MetaobjectDefinitionService } from '../services';
+import { authenticateUser } from '../middleware';
 
 export class MetaobjectDefinitionRouter {
   private readonly router: express.Router;
@@ -15,14 +16,14 @@ export class MetaobjectDefinitionRouter {
   private initializeRoutes(): void {
     this.router
       .route('/')
-      .get(this.metaobjectDefinitionController.getAllMetaobjectDefinitions)
-      .post(this.metaobjectDefinitionController.createMetaobjectDefinition);
+      .get(authenticateUser, this.metaobjectDefinitionController.getAllMetaobjectsDefinition)
+      .post(authenticateUser, this.metaobjectDefinitionController.createMetaobjectDefinition);
 
     this.router
       .route('/:id')
-      .get(this.metaobjectDefinitionController.getSingleMetaobjectDefinition)
-      .patch(this.metaobjectDefinitionController.updateMetaobjectDefinition)
-      .delete(this.metaobjectDefinitionController.deleteMetaobjectDefinition);
+      .get(authenticateUser, this.metaobjectDefinitionController.getSingleMetaobjectDefinition)
+      .patch(authenticateUser, this.metaobjectDefinitionController.updateMetaobjectDefinition)
+      .delete(authenticateUser, this.metaobjectDefinitionController.deleteMetaobjectDefinition);
   }
 
   public getRouter(): express.Router {

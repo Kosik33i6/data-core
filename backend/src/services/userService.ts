@@ -1,5 +1,5 @@
-import { Response } from 'express';
-import { UserInterface, AuthenticatedRequest } from '../types';
+import { Response, Request } from 'express';
+import { UserInterface } from '../types';
 import { User } from '../models';
 import {
   NotFoundError,
@@ -27,21 +27,20 @@ export class UserService {
   }
 
   public async getSingleUser(id: string) {
-    const user = await User.findById(id).select('-password');
+    const user = await User.findOne({ _id: id, role: { $ne: 'admin' } }).select(
+      '-password',
+    );
     if (!user) {
       throw new NotFoundError('User not found');
     }
     return { user };
   }
 
-  public async showCurrentUser(req: AuthenticatedRequest) {
+  public async showCurrentUser(req: Request) {
     return req.user;
   }
 
-  public async updateUser(req: AuthenticatedRequest, res: Response) {
-    if (!req.user) {
-      throw new UnauthenticatedError('User not authenticated');
-    }
+  public async updateUser(req: Request, res: Response) {
     const { id } = req.user;
     const { email, name } = req.body;
 
@@ -61,10 +60,7 @@ export class UserService {
     return { tokenUser };
   }
 
-  public async updateUserPassword(req: AuthenticatedRequest) {
-    if (!req.user) {
-      throw new UnauthenticatedError('User not authenticated');
-    }
+  public async updateUserPassword(req: Request) {
     const { oldPassword, newPassword } = req.body;
     if (!oldPassword || !newPassword) {
       throw new BadRequestError(
@@ -98,13 +94,7 @@ export class UserService {
     return { message: 'User was removed', user };
   }
 
-  public async deleteCurrentUser(
-    req: AuthenticatedRequest,
-    res: Response,
-  ): Promise<void> {
-    if (!req.user) {
-      throw new UnauthenticatedError('User not authenticated');
-    }
+  public async deleteCurrentUser(req: Request, res: Response): Promise<void> {
     const { id, role } = req.user;
     if (role === 'admin') {
       throw new UnauthorizedError('Admin user cannot be deleted');
@@ -114,6 +104,7 @@ export class UserService {
   }
 
   public async deleteAllUsers() {
+    if (process.env.NODE_ENV !== 'production') return;
     const users = await User.deleteMany({});
     return { message: 'Users were removed', users };
   }
